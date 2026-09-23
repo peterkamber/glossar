@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WortSchatz AI – Fachbegriffe & Glossar (Sek I)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef8ff',
+              100: '#d8efff',
+              200: '#b9e3fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+            },
+            accent: {
+              500: '#10b981',
+              600: '#059669',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- PDF.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    // Worker für PDF.js festlegen
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  </script>
+
+  <!-- Google Fonts Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    h1, h2, h3, .heading-font {
+      font-family: 'Outfit', sans-serif;
+    }
+    /* 3D Flip Card Effect */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-preserve-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      body {
+        background: white !important;
+        color: black !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-brand-100 selection:text-brand-700">
+
+  <header class="no-print bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-sky-400 text-white flex items-center justify-center shadow-md shadow-brand-500/20">
+          <i data-lucide="book-marked" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-slate-900 tracking-tight leading-none flex items-center gap-2">
+            WortSchatz <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-100 text-brand-700 border border-sky-200">Sek I Niveau</span>
+          </h1>
+          <p class="text-xs text-slate-500">Fachbegriffe & Fremdwörter einfach erklärt (Klasse 7–10)</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="helpBtn" class="text-slate-600 hover:text-slate-900 p-2 rounded-lg hover:bg-slate-100 transition text-sm flex items-center gap-1.5 font-medium" title="Hinweise zur Nutzung">
+          <i data-lucide="info" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Info & Hilfe</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+    
+    <!-- Top Step Card: Text Source Selection -->
+    <section class="no-print bg-white rounded-2xl border border-slate-200 shadow-sm p-6 lg:p-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-semibold text-brand-600 uppercase tracking-wider bg-brand-50 px-2.5 py-1 rounded-md mb-1.5">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Schritt 1: Text-Quelle wählen
+          </div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">PDF hochladen oder Text einfügen</h2>
+          <p class="text-slate-500 text-sm mt-1">Lade Buchseiten, Arbeitsblätter oder Referate hoch. Die KI filtert bis zu 30 anspruchsvolle Wörter heraus.</p>
+        </div>
+
+        <!-- Input Tab Selector -->
+        <div class="flex p-1 bg-slate-100 rounded-xl max-w-xs self-start md:self-auto border border-slate-200/80">
+          <button id="tabPdfBtn" class="flex-1 flex items-center justify-center gap-2 py-2 px-4 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-xs transition">
+            <i data-lucide="file-up" class="w-4 h-4 text-brand-600"></i> PDF-Datei
+          </button>
+          <button id="tabTextBtn" class="flex-1 flex items-center justify-center gap-2 py-2 px-4 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition">
+            <i data-lucide="file-text" class="w-4 h-4"></i> Textfeld
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Content 1: PDF Drop Zone -->
+      <div id="pdfTabContent" class="space-y-4">
+        <div id="dropZone" class="group border-2 border-dashed border-slate-300 hover:border-brand-500 rounded-2xl p-8 sm:p-10 transition-all cursor-pointer bg-slate-50/50 hover:bg-brand-50/20 text-center flex flex-col items-center justify-center">
+          <input type="file" id="pdfFileInput" accept="application/pdf" class="hidden">
+          <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center text-brand-600 group-hover:scale-110 group-hover:text-brand-700 transition duration-300 mb-4">
+            <i data-lucide="file-up" class="w-8 h-8"></i>
+          </div>
+          <h3 class="text-base font-semibold text-slate-800 mb-1">Klicke zum Auswählen oder ziehe deine PDF hierher</h3>
+          <p class="text-slate-500 text-xs sm:text-sm max-w-md">Unterstützt Schulbuchauszüge, Arbeitsblätter oder Aufsätze (PDF).</p>
+          <span class="mt-4 px-3.5 py-1.5 text-xs font-medium bg-white rounded-full border border-slate-200 text-slate-600 shadow-2xs group-hover:border-brand-300">
+            Maximale Seitenempfehlung: 1–15 Seiten
+          </span>
+        </div>
+
+        <!-- PDF Meta Preview Box -->
+        <div id="pdfMetaPreview" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs uppercase">
+              PDF
+            </div>
+            <div>
+              <p id="pdfFileName" class="text-sm font-semibold text-slate-800 truncate max-w-xs sm:max-w-md">dokument.pdf</p>
+              <p id="pdfPageInfo" class="text-xs text-slate-500">Wird geladen...</p>
+            </div>
+          </div>
+          <button id="removePdfBtn" class="text-xs text-red-600 hover:text-red-700 font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 flex items-center gap-1 self-end sm:self-auto">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Entfernen
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Content 2: Raw Textarea -->
+      <div id="textTabContent" class="hidden space-y-3">
+        <label for="rawTextInput" class="block text-xs font-semibold text-slate-700 uppercase tracking-wide">Textinhalt einfügen (z.B. aus Dokument oder Wikipedia)</label>
+        <textarea id="rawTextInput" rows="8" class="w-full rounded-xl border border-slate-300 p-4 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 placeholder:text-slate-400" placeholder="Kopiere hier einen Schultext, Zeitungsartikel oder Arbeitsblatt-Text hinein (z. B. über Photosynthese, Demokratie, Industrielle Revolution)..."></textarea>
+        <div class="flex justify-between items-center text-xs text-slate-500">
+          <span id="charCount">0 Zeichen</span>
+          <button id="loadSampleBtn" class="text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1 underline underline-offset-2">
+            <i data-lucide="sparkle" class="w-3 h-3"></i> Beispiel-Schultext laden (Ökosystem & Fotosynthese)
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100">
+        <div class="text-xs text-slate-500 flex items-center gap-1.5">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+          <span>Datenschutz: Lokale Textextraktion im Browser, schülergerechtes Sprachmodell.</span>
+        </div>
+        <button id="startAnalysisBtn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-600/25 hover:shadow-lg transition disabled:opacity-50 disabled:pointer-events-none">
+          <i data-lucide="wand-2" class="w-4 h-4"></i>
+          <span>Glossar jetzt erstellen</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="loadingSection" class="hidden no-print bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center">
+      <div class="max-w-md mx-auto space-y-4">
+        <div class="relative w-16 h-16 mx-auto">
+          <div class="w-16 h-16 rounded-full border-4 border-slate-100 border-t-brand-600 animate-spin"></div>
+          <div class="absolute inset-0 flex items-center justify-center text-brand-600">
+            <i data-lucide="book-open" class="w-6 h-6 animate-pulse"></i>
+          </div>
+        </div>
+        <h3 id="loadingStatusTitle" class="text-lg font-bold text-slate-800">Dokument wird verarbeitet...</h3>
+        <p id="loadingStatusDesc" class="text-sm text-slate-500">Extrahierte Texte werden aufbereitet und auf Fachbegriffe gescannt.</p>
+        
+        <!-- Progress Indicator -->
+        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-4">
+          <div id="loadingBar" class="bg-brand-600 h-full w-1/3 transition-all duration-500 ease-out"></div>
+        </div>
+      </div>
+    </section>
+
+    <div id="messageBanner" class="hidden rounded-xl p-4 text-sm font-medium border flex items-start gap-3 transition">
+      <i id="messageIcon" data-lucide="info" class="w-5 h-5 shrink-0 mt-0.5"></i>
+      <div class="flex-1" id="messageText">Nachrichtentext</div>
+      <button onclick="hideMessage()" class="text-slate-400 hover:text-slate-600 p-1">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <section id="resultsSection" class="hidden space-y-6">
+      
+      <!-- Result Control Bar -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+              Sekundarstufe I
+            </span>
+            <span id="termCountBadge" class="text-xs font-medium text-slate-500">0 Begriffe identifiziert</span>
+          </div>
+          <h2 id="resultTopicTitle" class="text-xl font-bold text-slate-900 mt-1">Fachbegriff-Glossar</h2>
+        </div>
+
+        <!-- Mode Toggle & Export Tools -->
+        <div class="flex flex-wrap items-center gap-2 no-print">
+          <!-- View Modes -->
+          <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
+            <button id="viewTableBtn" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white shadow-2xs text-brand-700 flex items-center gap-1.5 transition">
+              <i data-lucide="table" class="w-3.5 h-3.5"></i> Tabelle
+            </button>
+            <button id="viewCardsBtn" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition">
+              <i data-lucide="layers" class="w-3.5 h-3.5"></i> Karteikarten
+            </button>
+          </div>
+
+          <div class="h-6 w-px bg-slate-200 mx-1"></div>
+
+          <!-- Export Buttons -->
+          <button id="copyClipboardBtn" class="px-3 py-2 text-xs font-medium bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 flex items-center gap-1.5 transition shadow-2xs">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Kopieren
+          </button>
+          <button id="exportCsvBtn" class="px-3 py-2 text-xs font-medium bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 flex items-center gap-1.5 transition shadow-2xs">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> CSV
+          </button>
+          <button id="printBtn" class="px-3 py-2 text-xs font-medium bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 flex items-center gap-1.5 transition shadow-2xs">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i> Drucken
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Search & Filter Bar -->
+      <div class="no-print bg-white rounded-xl border border-slate-200 p-3 shadow-xs flex flex-col sm:flex-row items-center gap-3">
+        <div class="relative w-full">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input type="text" id="glossarySearchInput" placeholder="Begriff oder Erklärung durchsuchen (z. B. 'Zelle', 'Stoffwechsel')..." class="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-between">
+          <span id="filterStatus" class="text-xs text-slate-500 whitespace-nowrap">Zeige alle</span>
+          <button id="clearSearchBtn" class="hidden text-xs text-brand-600 hover:text-brand-700 font-medium px-2 py-1">Zurücksetzen</button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: Two-column Glossary Table -->
+      <div id="tableView" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50/80 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <th class="py-4 px-6 w-1/3">
+                  <div class="flex items-center gap-1.5">
+                    <span>Fachbegriff / Fremdwort</span>
+                    <span class="text-[10px] text-brand-600 font-normal lowercase bg-brand-50 px-1.5 py-0.5 rounded border border-brand-200">A–Z sortiert</span>
+                  </div>
+                </th>
+                <th class="py-4 px-6 w-2/3">Erklärung & Alltagsbeispiel (Sek I Niveau)</th>
+                <th class="py-4 px-4 w-12 text-center no-print">Audio</th>
+              </tr>
+            </thead>
+            <tbody id="glossaryTableBody" class="divide-y divide-slate-100 text-sm">
+              <!-- Content generated dynamically -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Empty filter state -->
+        <div id="tableEmptyState" class="hidden py-12 text-center text-slate-500">
+          <i data-lucide="file-question" class="w-8 h-8 mx-auto text-slate-400 mb-2"></i>
+          <p class="font-medium text-slate-700">Keine passenden Begriffe gefunden.</p>
+          <p class="text-xs">Versuche einen anderen Suchbegriff.</p>
+        </div>
+      </div>
+
+      <!-- VIEW 2: Flashcards View (Karteikarten-Modus für Schüler) -->
+      <div id="cardsView" class="hidden space-y-4 no-print">
+        <div class="bg-gradient-to-r from-brand-500 to-sky-600 rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 class="font-bold text-lg heading-font">Lernmodus: Interaktive Karteikarten</h3>
+            <p class="text-xs text-sky-100 mt-1">Klicke auf die Karte, um die Definition aufzudecken. Ideal zum Lernen vor Klassenarbeiten!</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="flashcardIndexBadge" class="text-xs font-semibold px-3 py-1 bg-white/20 rounded-full backdrop-blur-xs">
+              Karte 1 von 1
+            </span>
+          </div>
+        </div>
+
+        <!-- Flip Card Container -->
+        <div class="max-w-xl mx-auto perspective-1000 my-6">
+          <div id="flashcardElement" class="w-full h-80 relative transform-style-preserve-3d transition-transform duration-500 cursor-pointer">
+            <!-- Front -->
+            <div class="absolute inset-0 backface-hidden bg-white border-2 border-slate-200 hover:border-brand-400 rounded-2xl p-8 flex flex-col items-center justify-between text-center shadow-lg transition-all">
+              <span class="text-xs uppercase tracking-wider font-semibold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-md">Vorderseite: Begriff</span>
+              <div class="my-auto">
+                <h4 id="cardTerm" class="text-3xl font-bold text-slate-900 heading-font mb-2">Photosynthese</h4>
+                <p id="cardCategory" class="text-xs text-slate-400 italic">Kategorie / Wortart</p>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-slate-400">
+                <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Tippe zum Umdrehen
+              </div>
+            </div>
+
+            <!-- Back -->
+            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-slate-900 text-white rounded-2xl p-8 flex flex-col justify-between shadow-xl">
+              <div class="flex justify-between items-center">
+                <span class="text-xs uppercase tracking-wider font-semibold text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded-md border border-emerald-800">Rückseite: Erklärung (Sek I)</span>
+                <button id="cardSpeechBtn" class="text-slate-300 hover:text-white p-1 rounded-lg hover:bg-slate-800" title="Vorlesen">
+                  <i data-lucide="volume-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+              
+              <div class="my-auto space-y-3">
+                <p id="cardDefinition" class="text-base text-slate-100 leading-relaxed">
+                  Erklärungstext...
+                </p>
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-xs text-sky-200">
+                  <span class="font-bold text-sky-400">Beispiel:</span> <span id="cardExample">Alltagsbeispiel...</span>
+                </div>
+              </div>
+
+              <div class="text-center text-xs text-slate-400">
+                Tippe erneut zum Zurückdrehen
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flashcard Controls -->
+        <div class="flex items-center justify-center gap-4 max-w-xs mx-auto">
+          <button id="cardPrevBtn" class="p-3 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs transition">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          <button id="cardFlipBtn" class="px-5 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-xs flex items-center gap-2">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Umdrehen
+          </button>
+          <button id="cardNextBtn" class="p-3 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs transition">
+            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="helpModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+          <i data-lucide="graduation-cap" class="w-5 h-5 text-brand-600"></i> Über WortSchatz AI
+        </h3>
+        <button id="closeHelpModal" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
+        <p><strong>Zielgruppe:</strong> Schülerinnen und Schüler sowie Lehrkräfte der Sekundarstufe I (Klassen 7 bis 10, ca. 12–16 Jahre).</p>
+        <p><strong>Funktionsweise:</strong></p>
+        <ul class="list-disc pl-5 space-y-1.5 text-xs text-slate-600">
+          <li><strong>PDF oder Text:</strong> Dokumente werden direkt im Webbrowser mit PDF.js ausgelesen.</li>
+          <li><strong>Begriffs-Extraktion:</strong> Das KI-Modell filtert bis zu 30 zentrale Fachbegriffe, Fremdwörter und Schlüsselkonzepte heraus.</li>
+          <li><strong>Sekundarstufe-I-Gerecht:</strong> Die Definitionen verzichten auf unnötigen wissenschaftlichen Ballast und nutzen verständliche Analogien und Alltagsbeispiele.</li>
+          <li><strong>Lernwerkzeuge:</strong> Mit dem Karteikarten-Modus und der Sprachausgabe können Begriffe direkt gelernt und geübt werden.</li>
+        </ul>
+      </div>
+      <div class="pt-3 border-t border-slate-100 flex justify-end">
+        <button id="dismissHelpBtn" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold">
+          Verstanden
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="no-print mt-auto py-6 border-t border-slate-200 bg-white text-center text-xs text-slate-400">
+    <p>WortSchatz AI – Didaktisches Glossar-Werkzeug für den Unterricht und selbstständiges Lernen.</p>
+  </footer>
+
+  <script>
+    // State variables
+    let currentInputMode = 'pdf'; // 'pdf' or 'text'
+    let extractedPdfText = '';
+    let loadedPdfName = '';
+    let termsData = [];
+    let filteredTerms = [];
+    let currentCardIndex = 0;
+    let isCardFlipped = false;
+
+    // Sample school text (Ökosystem & Fotosynthese)
+    const SAMPLE_TEXT = `Ökosystem Wald und die Bedeutung der Fotosynthese
+
+Ein Ökosystem ist eine funktionelle Einheit der Natur. Es setzt sich zusammen aus dem Biotop, also dem unbelebten Lebensraum wie Boden, Gestein, Wasser und Luft, sowie der Biozönose, der Gemeinschaft aller darin lebenden Organismen wie Pflanzen, Tieren, Pilzen und Mikroorganismen. In jedem Ökosystem herrschen abiotische Umweltfaktoren (Temperatur, Lichteinfall, Feuchtigkeit) und biotische Faktoren (Konkurrenz um Nahrung, Räuber-Beute-Beziehungen, Symbiosen).
+
+Eine Schlüsselrolle im globalen Kohlenstoffkreislauf spielen die autotrophen Pflanzen. Durch den Prozess der Fotosynthese wandeln sie mithilfe des grünen Farbstoffs Chlorophyll in den Chloroplasten energiearme anorganische Stoffe – nämlich Kohlenstoffdioxid (CO2) aus der Luft und Wasser (H2O) aus dem Wurzelbereich – unter Nutzung von Sonnenlicht in energiereiche organische Glucose (Traubenzucker) um. Als Nebenprodukt entsteht lebensnotwendiger molekularer Sauerstoff (O2), der über die Stomata (Spaltöffnungen) der Blätter an die Atmosphäre abgegeben wird.
+
+Pflanzen stellen damit die Primärproduzenten der Nahrungskette dar. Herbivoren (Pflanzenfresser) wie Rehe oder Raupen konsumieren diese Biomasse. Karnivoren (Fleischfresser) jagen die Pflanzenfresser. Destruenten wie Regenwürmer, Bakterien und Pilze zersetzen schließlich abgestorbene organische Substanzen zu Humus und mineralisieren Nährstoffe zurück in den Boden. Wenn Umweltgifte oder der anthropogene Klimawandel diese empfindliche Homöostase (Gleichgewicht) stören, droht ein Biodiversitätsverlust, der ganze trophische Ebenen destabilisieren kann.`;
+
+    // DOM Elements
+    const tabPdfBtn = document.getElementById('tabPdfBtn');
+    const tabTextBtn = document.getElementById('tabTextBtn');
+    const pdfTabContent = document.getElementById('pdfTabContent');
+    const textTabContent = document.getElementById('textTabContent');
+    const dropZone = document.getElementById('dropZone');
+    const pdfFileInput = document.getElementById('pdfFileInput');
+    const pdfMetaPreview = document.getElementById('pdfMetaPreview');
+    const pdfFileName = document.getElementById('pdfFileName');
+    const pdfPageInfo = document.getElementById('pdfPageInfo');
+    const removePdfBtn = document.getElementById('removePdfBtn');
+    const rawTextInput = document.getElementById('rawTextInput');
+    const charCount = document.getElementById('charCount');
+    const loadSampleBtn = document.getElementById('loadSampleBtn');
+    const startAnalysisBtn = document.getElementById('startAnalysisBtn');
+
+    const loadingSection = document.getElementById('loadingSection');
+    const loadingStatusTitle = document.getElementById('loadingStatusTitle');
+    const loadingStatusDesc = document.getElementById('loadingStatusDesc');
+    const loadingBar = document.getElementById('loadingBar');
+    const resultsSection = document.getElementById('resultsSection');
+    const termCountBadge = document.getElementById('termCountBadge');
+    const resultTopicTitle = document.getElementById('resultTopicTitle');
+    const glossaryTableBody = document.getElementById('glossaryTableBody');
+    const tableEmptyState = document.getElementById('tableEmptyState');
+    const glossarySearchInput = document.getElementById('glossarySearchInput');
+    const filterStatus = document.getElementById('filterStatus');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+    const viewTableBtn = document.getElementById('viewTableBtn');
+    const viewCardsBtn = document.getElementById('viewCardsBtn');
+    const tableView = document.getElementById('tableView');
+    const cardsView = document.getElementById('cardsView');
+
+    const flashcardElement = document.getElementById('flashcardElement');
+    const cardTerm = document.getElementById('cardTerm');
+    const cardCategory = document.getElementById('cardCategory');
+    const cardDefinition = document.getElementById('cardDefinition');
+    const cardExample = document.getElementById('cardExample');
+    const cardIndexBadge = document.getElementById('flashcardIndexBadge');
+    const cardPrevBtn = document.getElementById('cardPrevBtn');
+    const cardNextBtn = document.getElementById('cardNextBtn');
+    const cardFlipBtn = document.getElementById('cardFlipBtn');
+    const cardSpeechBtn = document.getElementById('cardSpeechBtn');
+
+    const copyClipboardBtn = document.getElementById('copyClipboardBtn');
+    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const printBtn = document.getElementById('printBtn');
+
+    const helpBtn = document.getElementById('helpBtn');
+    const helpModal = document.getElementById('helpModal');
+    const closeHelpModal = document.getElementById('closeHelpModal');
+    const dismissHelpBtn = document.getElementById('dismissHelpBtn');
+    const messageBanner = document.getElementById('messageBanner');
+    const messageText = document.getElementById('messageText');
+    const messageIcon = document.getElementById('messageIcon');
+
+    // Initialize Lucide icons on start
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+
+    function showMessage(text, type = 'info') {
+      messageBanner.classList.remove('hidden', 'bg-red-50', 'text-red-800', 'border-red-200', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-sky-50', 'text-sky-800', 'border-sky-200');
+      
+      if (type === 'error') {
+        messageBanner.classList.add('bg-red-50', 'text-red-800', 'border-red-200');
+        messageIcon.setAttribute('data-lucide', 'alert-circle');
+      } else if (type === 'success') {
+        messageBanner.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
+        messageIcon.setAttribute('data-lucide', 'check-circle-2');
+      } else {
+        messageBanner.classList.add('bg-sky-50', 'text-sky-800', 'border-sky-200');
+        messageIcon.setAttribute('data-lucide', 'info');
+      }
+      
+      messageText.textContent = text;
+      lucide.createIcons();
+      messageBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function hideMessage() {
+      messageBanner.classList.add('hidden');
+    }
+
+    tabPdfBtn.addEventListener('click', () => {
+      currentInputMode = 'pdf';
+      tabPdfBtn.className = "flex-1 flex items-center justify-center gap-2 py-2 px-4 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-xs transition";
+      tabTextBtn.className = "flex-1 flex items-center justify-center gap-2 py-2 px-4 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition";
+      pdfTabContent.classList.remove('hidden');
+      textTabContent.classList.add('hidden');
+    });
+
+    tabTextBtn.addEventListener('click', () => {
+      currentInputMode = 'text';
+      tabTextBtn.className = "flex-1 flex items-center justify-center gap-2 py-2 px-4 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-xs transition";
+      tabPdfBtn.className = "flex-1 flex items-center justify-center gap-2 py-2 px-4 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition";
+      textTabContent.classList.remove('hidden');
+      pdfTabContent.classList.add('hidden');
+    });
+
+    rawTextInput.addEventListener('input', () => {
+      charCount.textContent = `${rawTextInput.value.length.toLocaleString('de-DE')} Zeichen`;
+    });
+
+    loadSampleBtn.addEventListener('click', () => {
+      rawTextInput.value = SAMPLE_TEXT;
+      charCount.textContent = `${rawTextInput.value.length.toLocaleString('de-DE')} Zeichen`;
+      showMessage('Mustertext über Ökosystem & Fotosynthese eingefügt! Klicke auf "Glossar jetzt erstellen".', 'info');
+    });
+
+    // Dropzone interaction
+    dropZone.addEventListener('click', () => pdfFileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-brand-500', 'bg-brand-50/50');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('border-brand-500', 'bg-brand-50/50');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-brand-500', 'bg-brand-50/50');
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+          handlePdfFile(file);
+        } else {
+          showMessage('Bitte lade eine gültige PDF-Datei hoch.', 'error');
+        }
+      }
+    });
+
+    pdfFileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handlePdfFile(e.target.files[0]);
+      }
+    });
+
+    removePdfBtn.addEventListener('click', () => {
+      extractedPdfText = '';
+      loadedPdfName = '';
+      pdfFileInput.value = '';
+      pdfMetaPreview.classList.add('hidden');
+      dropZone.classList.remove('hidden');
+      showMessage('PDF entfernt.', 'info');
+    });
+
+    async function handlePdfFile(file) {
+      loadedPdfName = file.name;
+      pdfFileName.textContent = file.name;
+      pdfPageInfo.textContent = "Wird ausgelesen...";
+      dropZone.classList.add('hidden');
+      pdfMetaPreview.classList.remove('hidden');
+      hideMessage();
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdf = await loadingTask.promise;
+        const totalPages = pdf.numPages;
+
+        let fullText = '';
+        for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map(item => item.str).join(' ');
+          fullText += `\n--- Seite ${pageNum} ---\n` + pageText;
+        }
+
+        extractedPdfText = fullText.trim();
+        if (!extractedPdfText || extractedPdfText.length < 30) {
+          throw new Error('In dieser PDF-Datei konnte kein lesbarer Text gefunden werden (möglicherweise handelt es sich um ein reines Bild/Scan).');
+        }
+
+        pdfPageInfo.textContent = `${totalPages} Seite(n) erkannt · ca. ${extractedPdfText.length.toLocaleString('de-DE')} Zeichen`;
+        showMessage(`PDF "${file.name}" erfolgreich mit ${totalPages} Seite(n) eingelesen!`, 'success');
+      } catch (err) {
+        console.error('PDF parsing error:', err);
+        pdfMetaPreview.classList.add('hidden');
+        dropZone.classList.remove('hidden');
+        showMessage('Fehler beim Lesen der PDF: ' + (err.message || 'Unbekannter Fehler'), 'error');
+      }
+    }
+
+    async function analyzeTextWithGemini(inputText) {
+      const apiKey = "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const systemInstruction = `Du bist ein erfahrener Gymnasial- und Realschullehrer für die Sekundarstufe I (Klassen 7 bis 10, Schüleralter 12-16 Jahre).
+Deine Aufgabe ist es, aus dem übergebenen Unterrichtstext die wichtigsten Fachbegriffe, Fremdwörter und wissenschaftlichen Schlüsselkonzepte zu extrahieren (mindestens 12, maximal 30 Begriffe).
+Regeln für die Ausgabe:
+1. Wähle wirklich anspruchsvolle, fachspezifische Begriffe oder Fremdwörter (z. B. "Fotosynthese", "Biotop", "Inflation", "Demokratie", "Katalysator", "Feudalismus").
+2. Sortiere die Liste streng ALPHABETISCH nach Begriff (A-Z).
+3. Erkläre jeden Begriff passgenau für Schülerinnen und Schüler der Sekundarstufe I: Verständlich, präzise, ohne unnötiges Hochschul-Kauderwelsch, aber fachlich korrekt.
+4. Gib zu jedem Begriff ein konkretes, alltagsnahes Beispiel oder eine passende Analogie an ("Beispiel: ...").
+5. Ergänze die Wortart/Kategorie (z. B. "Substantiv (Biologie)", "Fremdwort (Politik)").
+6. Schätze kurz das Hauptthema des Textes ein.`;
+
+      // Prompt mit Textbegrenzung (bis zu 25.000 Zeichen zur stabilen Verarbeitung)
+      const userPrompt = `Hier ist der Text zur Analyse:\n\n${inputText.substring(0, 25000)}`;
+
+      const payload = {
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: userPrompt }]
+          }
+        ],
+        systemInstruction: {
+          parts: [{ text: systemInstruction }]
+        },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              topic: { 
+                type: "STRING", 
+                description: "Übergeordnetes Fachgebiet oder Thema des Textes (z.B. Ökologie & Pflanzenbiologie)" 
+              },
+              terms: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    term: { type: "STRING", description: "Der Fachbegriff oder das Fremdwort im Nominativ Singular" },
+                    category: { type: "STRING", description: "Kategorie oder Fachbereich, z.B. Biologie / Substantiv" },
+                    explanation: { type: "STRING", description: "Verständliche Erklärung auf Sekundarstufe-I-Niveau (2-3 Sätze)" },
+                    example: { type: "STRING", description: "Alltagsnahes, greifbares Beispiel oder schülergerechter Kontext" }
+                  },
+                  required: ["term", "explanation", "example"]
+                }
+              }
+            },
+            required: ["topic", "terms"]
+          }
+        }
+      };
+
+      // Implementierung mit Exponential Backoff für Throttling
+      let delay = 1000;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            throw new Error(`API-Anfrage fehlgeschlagen mit Status: ${response.status}`);
+          }
+
+          const result = await response.json();
+          const jsonText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!jsonText) {
+            throw new Error('Keine Antwort vom Modell erhalten.');
+          }
+
+          return JSON.parse(jsonText);
+        } catch (error) {
+          if (attempt === 3) throw error;
+          await new Promise(r => setTimeout(r, delay));
+          delay *= 2;
+        }
+      }
+    }
+
+    startAnalysisBtn.addEventListener('click', async () => {
+      hideMessage();
+      let contentToAnalyze = '';
+
+      if (currentInputMode === 'pdf') {
+        if (!extractedPdfText) {
+          showMessage('Bitte wähle zuerst eine PDF-Datei aus oder wechsle zum Textfeld.', 'error');
+          return;
+        }
+        contentToAnalyze = extractedPdfText;
+      } else {
+        const val = rawTextInput.value.trim();
+        if (!val || val.length < 40) {
+          showMessage('Bitte gib mindestens 40 Zeichen Text ein, damit Fachbegriffe analysiert werden können.', 'error');
+          return;
+        }
+        contentToAnalyze = val;
+      }
+
+      // UI in Loading-State versetzen
+      startAnalysisBtn.disabled = true;
+      loadingSection.classList.remove('hidden');
+      resultsSection.classList.add('hidden');
+      loadingStatusTitle.textContent = "Fachbegriffe werden identifiziert...";
+      loadingStatusDesc.textContent = "Die KI scannt den Text nach zentralen Fremdwörtern und formuliert schülergerechte Erklärungen...";
+      loadingBar.style.width = "40%";
+
+      try {
+        setTimeout(() => { loadingBar.style.width = "75%"; }, 1200);
+
+        const analysisResult = await analyzeTextWithGemini(contentToAnalyze);
+
+        loadingBar.style.width = "100%";
+
+        if (!analysisResult.terms || analysisResult.terms.length === 0) {
+          throw new Error('Im Text wurden keine relevanten Fachbegriffe gefunden. Bitte versuche einen anspruchsvolleren Fachtext.');
+        }
+
+        // Sort terms alphabetically A-Z just in case
+        termsData = analysisResult.terms.sort((a, b) => a.term.localeCompare(b.term, 'de'));
+        filteredTerms = [...termsData];
+
+        // Update titles and counters
+        resultTopicTitle.textContent = analysisResult.topic || "Fachbegriff-Glossar";
+        termCountBadge.textContent = `${termsData.length} Fachbegriffe gefunden (A–Z)`;
+
+        // Render Views
+        renderTableView();
+        initFlashcards();
+
+        loadingSection.classList.add('hidden');
+        resultsSection.classList.remove('hidden');
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+        showMessage(`Glossar mit ${termsData.length} Begriffen erfolgreich erstellt!`, 'success');
+      } catch (err) {
+        console.error('Analyse-Fehler:', err);
+        loadingSection.classList.add('hidden');
+        showMessage('Fehler bei der Analyse: ' + (err.message || 'Die Begriffs-Extraktion konnte nicht abgeschlossen werden.'), 'error');
+      } finally {
+        startAnalysisBtn.disabled = false;
+        loadingBar.style.width = "30%";
+      }
+    });
+
+    function renderTableView() {
+      glossaryTableBody.innerHTML = '';
+
+      if (filteredTerms.length === 0) {
+        tableEmptyState.classList.remove('hidden');
+        return;
+      }
+
+      tableEmptyState.classList.add('hidden');
+
+      filteredTerms.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.className = "hover:bg-slate-50/70 transition-colors border-b border-slate-100";
+        
+        row.innerHTML = `
+          <td class="py-4 px-6 align-top">
+            <div class="font-bold text-slate-900 text-base flex items-baseline gap-2">
+              <span class="text-xs text-brand-600 font-mono select-none">${index + 1}.</span>
+              <span>${escapeHtml(item.term)}</span>
+            </div>
+            ${item.category ? `<span class="inline-block mt-1 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded">${escapeHtml(item.category)}</span>` : ''}
+          </td>
+          <td class="py-4 px-6 align-top space-y-2">
+            <p class="text-slate-700 leading-relaxed">${escapeHtml(item.explanation)}</p>
+            <div class="text-xs bg-brand-50/70 border border-brand-100 text-brand-900 rounded-lg p-2.5 flex items-start gap-1.5">
+              <span class="font-semibold text-brand-700 shrink-0">Beispiel:</span>
+              <span class="italic text-slate-600">${escapeHtml(item.example)}</span>
+            </div>
+          </td>
+          <td class="py-4 px-4 align-top text-center no-print">
+            <button class="speak-btn text-slate-400 hover:text-brand-600 p-2 rounded-lg hover:bg-brand-50 transition" title="Aussprache anhören" data-term="${encodeURIComponent(item.term)}">
+              <i data-lucide="volume-2" class="w-4 h-4"></i>
+            </button>
+          </td>
+        `;
+
+        glossaryTableBody.appendChild(row);
+      });
+
+      // Bind speech listeners
+      glossaryTableBody.querySelectorAll('.speak-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const word = decodeURIComponent(btn.getAttribute('data-term'));
+          speakWord(word);
+        });
+      });
+
+      lucide.createIcons();
+    }
+
+    function speakWord(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Stoppe vorherige Ausgabe
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'de-DE';
+        utterance.rate = 0.9; // Leicht langsamer für didaktische Verständlichkeit
+        window.speechSynthesis.speak(utterance);
+      } else {
+        showMessage('Die Sprachausgabe wird von deinem Browser leider nicht unterstützt.', 'info');
+      }
+    }
+
+    function initFlashcards() {
+      currentCardIndex = 0;
+      isCardFlipped = false;
+      updateFlashcardView();
+    }
+
+    function updateFlashcardView() {
+      if (termsData.length === 0) return;
+      
+      const current = termsData[currentCardIndex];
+      cardTerm.textContent = current.term;
+      cardCategory.textContent = current.category || "Fachbegriff (Sek I)";
+      cardDefinition.textContent = current.explanation;
+      cardExample.textContent = current.example;
+      
+      cardIndexBadge.textContent = `Karte ${currentCardIndex + 1} von ${termsData.length}`;
+
+      // Reset flip state when navigating
+      isCardFlipped = false;
+      flashcardElement.classList.remove('rotate-y-180');
+    }
+
+    function toggleFlipCard() {
+      isCardFlipped = !isCardFlipped;
+      if (isCardFlipped) {
+        flashcardElement.classList.add('rotate-y-180');
+      } else {
+        flashcardElement.classList.remove('rotate-y-180');
+      }
+    }
+
+    flashcardElement.addEventListener('click', toggleFlipCard);
+    cardFlipBtn.addEventListener('click', toggleFlipCard);
+
+    cardPrevBtn.addEventListener('click', () => {
+      if (currentCardIndex > 0) {
+        currentCardIndex--;
+        updateFlashcardView();
+      } else {
+        currentCardIndex = termsData.length - 1; // Loop
+        updateFlashcardView();
+      }
+    });
+
+    cardNextBtn.addEventListener('click', () => {
+      if (currentCardIndex < termsData.length - 1) {
+        currentCardIndex++;
+        updateFlashcardView();
+      } else {
+        currentCardIndex = 0; // Loop
+        updateFlashcardView();
+      }
+    });
+
+    cardSpeechBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const current = termsData[currentCardIndex];
+      speakWord(`${current.term}. ${current.explanation}`);
+    });
+
+    // Keyboard navigation for cards
+    window.addEventListener('keydown', (e) => {
+      if (cardsView.classList.contains('hidden')) return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      if (e.key === 'ArrowLeft') {
+        cardPrevBtn.click();
+      } else if (e.key === 'ArrowRight') {
+        cardNextBtn.click();
+      } else if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        toggleFlipCard();
+      }
+    });
+
+    glossarySearchInput.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      
+      if (!q) {
+        filteredTerms = [...termsData];
+        filterStatus.textContent = `Zeige alle (${filteredTerms.length})`;
+        clearSearchBtn.classList.add('hidden');
+      } else {
+        filteredTerms = termsData.filter(item => 
+          item.term.toLowerCase().includes(q) || 
+          item.explanation.toLowerCase().includes(q) ||
+          (item.example && item.example.toLowerCase().includes(q))
+        );
+        filterStatus.textContent = `${filteredTerms.length} Treffer`;
+        clearSearchBtn.classList.remove('hidden');
+      }
+
+      renderTableView();
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+      glossarySearchInput.value = '';
+      filteredTerms = [...termsData];
+      filterStatus.textContent = `Zeige alle (${filteredTerms.length})`;
+      clearSearchBtn.classList.add('hidden');
+      renderTableView();
+    });
+
+    viewTableBtn.addEventListener('click', () => {
+      tableView.classList.remove('hidden');
+      cardsView.classList.add('hidden');
+      viewTableBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-white shadow-2xs text-brand-700 flex items-center gap-1.5 transition";
+      viewCardsBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition";
+    });
+
+    viewCardsBtn.addEventListener('click', () => {
+      cardsView.classList.remove('hidden');
+      tableView.classList.add('hidden');
+      viewCardsBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-white shadow-2xs text-brand-700 flex items-center gap-1.5 transition";
+      viewTableBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition";
+      updateFlashcardView();
+    });
+
+    copyClipboardBtn.addEventListener('click', () => {
+      if (termsData.length === 0) return;
+
+      let textOutput = `Fachbegriffe & Glossar: ${resultTopicTitle.textContent}\nNiveau: Sekundarstufe I\n\n`;
+      termsData.forEach((item, i) => {
+        textOutput += `${i + 1}. ${item.term} (${item.category || 'Fachbegriff'}):\n`;
+        textOutput += `   Erklärung: ${item.explanation}\n`;
+        textOutput += `   Beispiel: ${item.example}\n\n`;
+      });
+
+      // Standard-konformes Kopieren im iFrame
+      const tempTextArea = document.createElement('textarea');
+      tempTextArea.value = textOutput;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      try {
+        document.execCommand('copy');
+        showMessage('Glossar erfolgreich in die Zwischenablage kopiert!', 'success');
+      } catch (err) {
+        showMessage('Kopieren fehlgeschlagen.', 'error');
+      }
+      document.body.removeChild(tempTextArea);
+    });
+
+    exportCsvBtn.addEventListener('click', () => {
+      if (termsData.length === 0) return;
+
+      let csv = '\uFEFF'; // UTF-8 BOM für Excel
+      csv += 'Fachbegriff;Kategorie;Erklaerung;Beispiel\n';
+
+      termsData.forEach(item => {
+        const cleanTerm = `"${(item.term || '').replace(/"/g, '""')}"`;
+        const cleanCat = `"${(item.category || '').replace(/"/g, '""')}"`;
+        const cleanExp = `"${(item.explanation || '').replace(/"/g, '""')}"`;
+        const cleanEx = `"${(item.example || '').replace(/"/g, '""')}"`;
+        csv += `${cleanTerm};${cleanCat};${cleanExp};${cleanEx}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Glossar_${resultTopicTitle.textContent.replace(/[^a-zA-Z0-9]/g, '_')}_SekI.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showMessage('CSV-Datei wurde heruntergeladen.', 'success');
+    });
+
+    printBtn.addEventListener('click', () => {
+      window.print();
+    });
+
+    helpBtn.addEventListener('click', () => helpModal.classList.remove('hidden'));
+    closeHelpModal.addEventListener('click', () => helpModal.classList.add('hidden'));
+    dismissHelpBtn.addEventListener('click', () => helpModal.classList.add('hidden'));
+
+    helpModal.addEventListener('click', (e) => {
+      if (e.target === helpModal) helpModal.classList.add('hidden');
+    });
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
